@@ -6,4 +6,4 @@ The code block executed.
 
 Calculated (from code): only output produced by the code, or middle-truncated output for brevity.
 
-Inferred / Reasoning: Your analysis of the output of the code (in order to respond to the prompt)
+Inferred / Reasoning: Your analysis of the output of the code (in order to respond to the prompt).
