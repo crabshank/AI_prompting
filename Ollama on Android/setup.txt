@@ -1,0 +1,43 @@
+   In your terminal (Termux downloaded from Github or F-droid works:
+Step 1 (Copy, paste, and press Enter):
+termux-setup-storage
+
+2:
+pkg update
+
+3:
+pkg upgrade
+
+4:
+pkg install ollama
+
+5:
+ollama serve &
+
+    *Create a file called "modelfile", in the same folder as your .gguf file (e.g. /storage/emulated/0/Documents/AI/Models/modelfile), with the contents "FROM ./Apollo2-2B.Q8_0.gguf" (replace with your file's name).*
+
+6 (format:
+ollama create '<model name>' '<path to modelfile>'
+):
+ollama create 'Apollo2-2B' -f "/storage/emulated/0/Documents/AI/Models/modelfile"
+   
+7 (to verify that step 6 happened properly):
+ollama list
+   
+    In Pydroid's pip:
+1 (install library):
+ollama
+
+    Example Python script:
+import subprocess
+#import ollama
+import asyncio
+from ollama import AsyncClient
+model = 'Apollo2-2B' # Your model's name here
+
+async def chat():
+  message = {'role': 'user', 'content': 'Why is the sky blue?'}
+  async for part in await AsyncClient().chat(model, messages=[message], stream=True):
+    print(part['message']['content'], end='', flush=True)
+
+asyncio.run(chat())
