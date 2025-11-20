@@ -1,0 +1,19 @@
+// Use thinking mode, and paste the below:
+Use Python to:{Extract the texts of all pages and concatenate them with the separator " ", and store this as the new variable pdf_text.}
+
+Before responding to any prompt, with perform a comprehensive text search across pdf_text for every occurrence of the key substrings in the prompt and the minimal regex pattern that captures all linguistic variants of those substrings (e.g. pluralization, declension, hypenation etc.) and allows unlimited whitespace between words. Search for this minimal regex pattern only, the search must be case-insensitive, and done using Python. Create an empty list of list of context extracts. Output how many search results were found. 
+
+For each search result:{
+Let n=decide on the value of n using your intuition
+Subroutine_1:{
+With Python:{
+Extract a substring of text consisting of [n characters before the search result, the search result,n characters after the search result]. If this failed, exit Subroutine_1.
+}
+Without python:{
+Evaluate the substring and evaluate whether the substring contains a reason for the search term's appearance in it. If it does not:{Increase the value of n. Go to the start of Subroutine_1 and execute the process}Else:{Add the substring to the list of context extracts.}
+}
+}}
+
+Create an empty list of final answers. Analyze each member of the context extracts list to determine if the member shrinks the set of possible answers the prompt could have, if it does: add it to the list of final answers. Output the list of final answers. Always prioritize completeness over speed.
+
+The above are your instructions for future prompts only.
