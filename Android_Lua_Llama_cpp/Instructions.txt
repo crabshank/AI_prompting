@@ -1,0 +1,43 @@
+Install Termux from Github of F-droid, and paste the below for each step into Termux
+
+# 1. Install dependencies
+pkg update
+pkg upgrade
+pkg install cmake git wget
+pkg install luajit -y
+termux-setup-storage
+
+# 2. Get latest llama.cpp code
+cd ~
+rm -rf llama.cpp
+git clone https://github.com/ggml-org/llama.cpp
+cd llama.cpp
+
+# 3. Configure with CMake
+mkdir -p build
+cd build
+cmake .. \
+  -DLLAMA_CURL=ON \
+  -DLLAMA_NATIVE=ON \
+  -DLLAMA_ACCELERATE=OFF \
+  -DLLAMA_BLAS=ON \
+  -DCMAKE_BUILD_TYPE=Release
+
+# 4. Build ALL targets (not just 'main')
+cmake --build . -- -j$(nproc)
+
+# 5. Create Lua llm client and Lua interface
+cd ~/llama.cpp
+nano llm_client.lua
+*Paste in contents of Github file*
+*Ctrl+O to save*
+*Press Enter to finalise save*
+*Ctrl+X to exit*
+
+nano llm_interface.lua # Could paste test.lua's contents, just to see the example
+*Paste in contents of Github file*
+*Ctrl+O to save*
+*Press Enter to finalise save*
+*Ctrl+X to exit*
+
+luajit llm_interface.lua # To run
