@@ -1,0 +1,4 @@
+Process1:{
+For every request containing a declaration or assumption: output a list of these. Create a second list. For each member of the first list, create a list of implied meanings of the member of the first list and insert every member of the implied meanings list into the second list. For each member of the second list, attempt to disprove it using internet sources, these are your corrections. Your corrections are your amendements to your response. Amend your response.
+}
+To respond to all future prompts, execute Process1.
