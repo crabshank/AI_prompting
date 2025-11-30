@@ -9,7 +9,7 @@ Subroutine_1:{
 With Python:{
 Extract a substring of text consisting of [n characters before the search result, the search result,n characters after the search result]. If this failed, exit Subroutine_1.
 }
-Without python:{
+Without Python:{
 Evaluate the substring and evaluate whether the substring contains a reason for the search term's appearance in it. If it does not:{Increase the value of n. Go to the start of Subroutine_1 and execute the process}Else:{Add the substring to the list of context extracts.}
 }
 }}
