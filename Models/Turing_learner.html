@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Turing Machine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #e2e8f0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #22d3ee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .subtitle {
+            color: #94a3b8;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 1200px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .panel {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        h2 {
+            font-size: 20px;
+            color: #f1f5f9;
+        }
+        .training-data-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .training-arrays-title {
+            margin-bottom: 8px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        .training-arrays {
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            padding: 12px;
+            min-height: 120px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            outline: none;
+            color: #e2e8f0;
+        }
+        .training-arrays:focus {
+            border-color: #22d3ee;
+            box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.3);
+        }
+        input[type="text"], input[type="number"], select {
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 4px;
+            padding: 6px 10px;
+            color: #e2e8f0;
+            font-size: 13px;
+        }
+        input[type="number"] {
+            width: 80px;
+        }
+        input[type="text"] {
+            width: 120px;
+        }
+        select {
+            width: 140px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #22d3ee;
+        }
+        .arrow {
+            color: #22d3ee;
+            font-weight: bold;
+        }
+        .code-display {
+            background: #1e293b;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #22d3ee;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .code-display.empty {
+            color: #64748b;
+            font-style: italic;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .status {
+            margin-top: 10px;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+        .status-highlight {
+            color: #22d3ee;
+            font-weight: bold;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .btn-train {
+            background: linear-gradient(135deg, #0891b2 0%, #3b82f6 100%);
+            color: white;
+        }
+        .btn-train:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(8, 145, 178, 0.4);
+        }
+        .btn-execute {
+            background: #10b981;
+            color: white;
+        }
+        .btn-execute:hover:not(:disabled) {
+            background: #059669;
+        }
+        .btn-reset {
+            background: #475569;
+            color: white;
+        }
+        .btn-reset:hover {
+            background: #334155;
+        }
+        .btn-remove {
+            padding: 4px 8px;
+            font-size: 11px;
+            background: #ef4444;
+            color: white;
+            border-radius: 4px;
+        }
+        .btn-remove:hover {
+            background: #dc2626;
+        }
+        .log-display {
+            background: #1e293b;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #4ade80;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-line {
+            margin-bottom: 5px;
+        }
+        .instructions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 8px;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+        .instruction-item {
+            display: flex;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(34, 211, 238, 0.1);
+            border: 1px solid #334155;
+        }
+        .instruction-name {
+            color: #22d3ee;
+            font-weight: 600;
+            min-width: 80px;
+        }
+        .instruction-desc {
+            color: #94a3b8;
+        }
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #22d3ee;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .progress-container {
+            margin-top: 15px;
+        }
+        .progress-bar-wrapper {
+            background: #1e293b;
+            border-radius: 8px;
+            height: 30px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #0891b2 0%, #22d3ee 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .progress-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            font-size: 13px;
+        }
+        .stat-item {
+            background: #1e293b;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+        }
+        .stat-label {
+            color: #94a3b8;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .stat-value {
+            color: #22d3ee;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .config-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .config-label {
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .best-program-badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .generation-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .generation-item {
+            background: #1e293b;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            border: 1px solid #334155;
+        }
+        .generation-item.best {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .instruction-category {
+            grid-column: span 2;
+            font-weight: bold;
+            color: #22d3ee;
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid #334155;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                <path d="M12 16v6"/>
+                <path d="M16 19h-8"/>
+            </svg>
+            Learning Turing Machine
+        </h1>
+        <p class="subtitle">Neural program synthesis with assembly-style instructions</p>
+        <div class="grid">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Training Data</h2>
+                </div>
+                <div class="training-data-container">
+                    <div>
+                        <div class="training-arrays-title">Input Arrays</div>
+                        <div id="input-arrays" contenteditable="true" class="training-arrays">[1, 2, 3, 4, 5]
+[2, 3, 4, 5, 6]
+[3, 4, 5, 6, 7]
+[4, 5, 6, 7, 8]
+[5, 3, 22, 19, 9]</div>
+                    </div>
+                    <div>
+                        <div class="training-arrays-title">Output Arrays</div>
+                        <div id="output-arrays" contenteditable="true" class="training-arrays">[2, 4, 6, 8, 10]
+[4, 6, 8, 10, 12]
+[6, 8, 10, 12, 14]
+[8, 10, 12, 14, 16]
+[10, 6, 44, 38, 18]</div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>Training Configuration</h2>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label class="config-label">Population Size</label>
+                        <input type="number" id="population-size" value="1000" min="20" max="500" step="10">
+                    </div>
+                    <div class="config-item">
+                        <label class="config-label">Max Generations</label>
+                        <input type="number" id="max-generations" value="1000" min="50" max="2000" step="50">
+                    </div>
+                    <div class="config-item">
+                        <label class="config-label">Max Program Length</label>
+                        <input type="number" id="max-program-length" value="15" min="5" max="30" step="1">
+                    </div>
+                    <div class="config-item">
+                        <label class="config-label">Mutation Rate</label>
+                        <select id="mutation-rate">
+                            <option value="low">Low (Conservative)</option>
+                            <option value="medium" selected>Medium (Balanced)</option>
+                            <option value="high">High (Exploratory)</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label class="config-label">Selection Strategy</label>
+                        <select id="selection-strategy">
+                            <option value="tournament" selected>Tournament</option>
+                            <option value="roulette">Roulette Wheel</option>
+                            <option value="elite">Elite Only</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label class="config-label">Array Size</label>
+                        <input type="number" id="array-size" value="5" min="3" max="10" step="1">
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>Training Progress</h2>
+                <div class="progress-container">
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-bar" id="progress-bar" style="width: 0%">0%</div>
+                    </div>
+                    <div class="progress-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Generation</div>
+                            <div class="stat-value" id="generation">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Best Fitness</div>
+                            <div class="stat-value" id="fitness">0%</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Avg Fitness</div>
+                            <div class="stat-value" id="avg-fitness">0%</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Std dev</div>
+                            <div class="stat-value" id="std-dev">0%</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Solutions Found</div>
+                            <div class="stat-value" id="solutions-found">0</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="generation-list" id="generation-history"></div>
+            </div>
+        </div>
+        <div class="panel" style="margin-bottom: 20px;">
+            <h2>Learned Program <span id="best-badge"></span></h2>
+            <div id="program-display" class="code-display empty">No program learned yet</div>
+            <div class="status">
+                Program Length: <span class="status-highlight" id="program-length">0</span> instructions | 
+                Test Results: <span class="status-highlight" id="test-results">—</span>
+            </div>
+        </div>
+        <div class="controls">
+            <button class="btn-train" id="train-btn" onclick="startTraining()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                    <path d="M12 16v6"/>
+                    <path d="M16 19h-8"/>
+                </svg>
+                <span id="train-text">Train Program</span>
+            </button>
+            <button class="btn-execute" id="execute-btn" onclick="executeProgram()" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+                Execute
+            </button>
+            <button class="btn-reset" onclick="resetAll()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                </svg>
+                Reset
+            </button>
+        </div>
+        <div id="log-container" style="display: none; margin-top: 20px;">
+            <div class="panel">
+                <h2>Execution Log</h2>
+                <div id="execution-log" class="log-display"></div>
+            </div>
+        </div>
+        <div class="panel" style="margin-top: 20px;">
+            <h2>Available Instructions</h2>
+            <div class="instructions-grid">
+                <div class="instruction-category">Basic Operations</div>
+                <div class="instruction-item">
+                    <span class="instruction-name">CMP</span>
+                    <span class="instruction-desc">Compare two values and set flags</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">MOV</span>
+                    <span class="instruction-desc">Move value unconditionally</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">COPY</span>
+                    <span class="instruction-desc">Copy value (safe version of MOV)</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">SWAP</span>
+                    <span class="instruction-desc">Swap values between positions</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">WRITE</span>
+                    <span class="instruction-desc">Write literal value to scratchpad address</span>
+                </div>
+                <div class="instruction-category">Conditional Moves</div>
+                <div class="instruction-item">
+                    <span class="instruction-name">CMOVL</span>
+                    <span class="instruction-desc">Move if less than</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">CMOVLE</span>
+                    <span class="instruction-desc">Move if less than or equal</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">CMOVG</span>
+                    <span class="instruction-desc">Move if greater than</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">CMOVGE</span>
+                    <span class="instruction-desc">Move if greater or equal</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">CMOVE</span>
+                    <span class="instruction-desc">Move if equal</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">CMOVNE</span>
+                    <span class="instruction-desc">Move if not equal</span>
+                </div>
+                <div class="instruction-category">Arithmetic Operations</div>
+                <div class="instruction-item">
+                    <span class="instruction-name">ADD</span>
+                    <span class="instruction-desc">Add two values</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">SUB</span>
+                    <span class="instruction-desc">Subtract one value from another</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">MUL</span>
+                    <span class="instruction-desc">Multiply two values</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">DIV</span>
+                    <span class="instruction-desc">Divide one value by another</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">MOD</span>
+                    <span class="instruction-desc">Modulo operation (remainder)</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">INC</span>
+                    <span class="instruction-desc">Increment value by 1</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">DEC</span>
+                    <span class="instruction-desc">Decrement value by 1</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">MAX</span>
+                    <span class="instruction-desc">Maximum of two values</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">MIN</span>
+                    <span class="instruction-desc">Minimum of two values</span>
+                </div>
+                <div class="instruction-category">Bitwise Operations</div>
+                <div class="instruction-item">
+                    <span class="instruction-name">AND</span>
+                    <span class="instruction-desc">Bitwise AND operation</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">OR</span>
+                    <span class="instruction-desc">Bitwise OR operation</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">XOR</span>
+                    <span class="instruction-desc">Bitwise XOR operation</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">NOT</span>
+                    <span class="instruction-desc">Bitwise NOT operation</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">SHL</span>
+                    <span class="instruction-desc">Shift left (bitwise)</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">SHR</span>
+                    <span class="instruction-desc">Shift right (bitwise)</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">ROL</span>
+                    <span class="instruction-desc">Rotate left</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">ROR</span>
+                    <span class="instruction-desc">Rotate right</span>
+                </div>
+                <div class="instruction-category">Data Movement</div>
+                <div class="instruction-item">
+                    <span class="instruction-name">ZERO</span>
+                    <span class="instruction-desc">Set value to zero</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">SET1</span>
+                    <span class="instruction-desc">Set value to one</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">NEG</span>
+                    <span class="instruction-desc">Negate value</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-name">ABS</span>
+                    <span class="instruction-desc">Absolute value</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let trainingData = [];
+        let learnedProgram = [];
+        let isTraining = false;
+        let shouldStop = false;
+        let generationHistory = [];
+        let solutionsFound = 0;
+        
+
+function lerp(a, b, t){
+    return a * (1.0 - t) + b * t
+}
+
+//One-pass variance calculation - https://github.com/Atrix256/CalculateVariance1Pass/blob/master/main.cpp
+function mvsd_1pass(data){
+    if (data.length === 0){return [0,0,0]}
+    if (data.length === 1){return [data[0],0,0]}
+    
+    let avg = 0
+    let avg_squared = 0
+    let v=0
+    for (let i =1; i<=data.length; i++){
+        v = data[i-1];
+        avg = lerp(avg_squared, v, 1.0 / i);
+        avg_squared = lerp(avg_squared, v * v, 1.0 / i);
+    }
+    
+    
+    let vr=Math.abs(avg_squared - (avg * avg));
+    
+    return [avg,vr,Math.sqrt(vr)];
+}
+        
+        
+        
+        // Parse training data from the contentEditable divs
+        function parseTrainingData() {
+            const inputText = document.getElementById('input-arrays').textContent;
+            const outputText = document.getElementById('output-arrays').textContent;
+            // Extract arrays using regex to find [..., ...] patterns
+            const inputMatches = inputText.match(/\[.*?\]/g) || [];
+            const outputMatches = outputText.match(/\[.*?\]/g) || [];
+            // Convert matches to actual arrays
+            const inputs = inputMatches.map(match => {
+                try {
+                    return JSON.parse(match);
+                } catch (e) {
+                    return [];
+                }
+            });
+            const outputs = outputMatches.map(match => {
+                try {
+                    return JSON.parse(match);
+                } catch (e) {
+                    return [];
+                }
+            });
+            // Check if we have the same number of inputs and outputs
+            if (inputs.length !== outputs.length) {
+                alert(`Error: Number of input arrays (${inputs.length}) does not match number of output arrays (${outputs.length}). Please fix this before training.`);
+                return false;
+            }
+            // Create training data
+            trainingData = inputs.map((input, i) => ({
+                input: input,
+                output: outputs[i]
+            }));
+            return true;
+        }
+        function CMP(a, b, srcA, srcB) {
+            const x = srcA[a] !== undefined ? srcA[a] : 0;
+            const y = srcB[b] !== undefined ? srcB[b] : 0;
+            const cmp = {};
+            if (x === y) {
+                Object.assign(cmp, {E:true,NE:false,L:false,NL:true,LE:true,NLE:false,G:false,NG:true,GE:true,NGE:false});
+            } else if (x > y) {
+                Object.assign(cmp, {E:false,NE:true,L:false,NL:true,LE:false,NLE:true,G:true,NG:false,GE:true,NGE:false});
+            } else {
+                Object.assign(cmp, {E:false,NE:true,L:true,NL:false,LE:true,NLE:false,G:false,NG:true,GE:false,NGE:true});
+            }
+            return cmp;
+        }
+        function MOV(a, b, srcA, destB) {
+            const newDest = [...destB];
+            const value = srcA[a] !== undefined ? srcA[a] : 0;
+            if (b < newDest.length) {
+                newDest[b] = value;
+            }
+            return newDest;
+        }
+        function BINARY_OP(a, b, srcA, srcB, destB, opFunc, opName) {
+            const newDest = [...destB];
+            const valA = srcA[a] !== undefined ? srcA[a] : 0;
+            const valB = srcB[b] !== undefined ? srcB[b] : 0;
+            try {
+                let result = opFunc(valA, valB);
+                // Handle special cases like division by zero
+                if (opName === 'DIV' && valB === 0) result = 0;
+                if (opName === 'MOD' && valB === 0) result = 0;
+                // Ensure result is within reasonable bounds
+                result = Math.max(-10000, Math.min(10000, result));
+                if (b < newDest.length) {
+                    newDest[b] = Math.round(result);
+                }
+            } catch (e) {
+                // Fallback to safe value on error
+                if (b < newDest.length) {
+                    newDest[b] = 0;
+                }
+                console.warn(`Operation ${opName} error:`, e);
+            }
+            return newDest;
+        }
+        function BITWISE_OP(a, b, srcA, srcB, destB, opFunc, opName) {
+            const newDest = [...destB];
+            const valA = srcA[a] !== undefined ? srcA[a] : 0;
+            const valB = srcB[b] !== undefined ? srcB[b] : 0;
+            try {
+                const result = opFunc(Math.floor(valA), Math.floor(valB));
+                if (b < newDest.length) {
+                    newDest[b] = result;
+                }
+            } catch (e) {
+                if (b < newDest.length) {
+                    newDest[b] = 0;
+                }
+                console.warn(`Bitwise operation ${opName} error:`, e);
+            }
+            return newDest;
+        }
+        function runProgram(program, input, output) {
+            const arraySize = input.length;
+            const outSize=output.length;
+            let state = {
+                orig: [...input],        // New read-only storage
+                sln: Array(outSize).fill(0),         // Existing output storage  
+                scratch: Array(Math.max(arraySize,outSize)).fill(0),
+                cmp: {E:false,NE:false,L:false,NL:false,LE:false,NLE:false,G:false,NG:false,GE:false,NGE:false}
+            };
+            for (let i=0; i<Math.min(arraySize,outSize); i++){
+                    state.sln[i]=state.orig[i];
+               }
+            const log = [`Initial state: orig=${JSON.stringify(state.orig)}, sln=${JSON.stringify(state.sln)}, scratch=${JSON.stringify(state.scratch)}`];
+            for (const instr of program) {
+                const { op, args } = instr;
+                try {
+                    // Handle unary operations (INC, DEC, ABS, NEG, NOT)
+                    const unaryOps = ['INC', 'DEC', 'ABS', 'NEG', 'NOT'];
+                    if (unaryOps.includes(op)) {
+                        // Correct format: address, storageType
+                        if (args.length < 2) {
+                            log.push(`ERROR: ${op} requires address and storage type`);
+                            continue;
+                        }
+                        const address = args[0];
+                        const storageType = args[1];
+                        if (address >= arraySize) {
+                            log.push(`${op} failed: address ${address} out of bounds`);
+                            continue;
+                        }
+                        // Check if trying to write to read-only 'orig' storage
+                        if (storageType === 'orig') {
+                            log.push(`ERROR: Cannot modify read-only 'orig' storage with ${op}`);
+                            continue;
+                        }
+                        let newValue;
+                        const oldValue = storageType === 'sln' ? state.sln[address] : state.scratch[address];
+                        switch (op) {
+                            case 'INC': newValue = oldValue + 1; break;
+                            case 'DEC': newValue = oldValue - 1; break;
+                            case 'ABS': newValue = Math.abs(oldValue); break;
+                            case 'NEG': newValue = -oldValue; break;
+                            case 'NOT': newValue = ~Math.floor(oldValue); break;
+                        }
+                        newValue = Math.max(-10000, Math.min(10000, Math.round(newValue)));
+                        if (storageType === 'sln') {
+                            state.sln = [...state.sln];
+                            state.sln[address] = newValue;
+                        } else {
+                            state.scratch = [...state.scratch];
+                            state.scratch[address] = newValue;
+                        }
+                        log.push(`${op} [${storageType}][${address}]: ${oldValue} → ${newValue}`);
+                    }
+                    // Handle WRITE
+                    else if (op === 'WRITE') {
+                        const value = args[0];
+                        const address = args[1];
+                        if (address < state.scratch.length) {
+                            state.scratch = [...state.scratch];
+                            state.scratch[address] = value;
+                            log.push(`WRITE value ${value} to scratch[${address}]`);
+                        } else {
+                            log.push(`WRITE failed: address ${address} out of bounds`);
+                        }
+                    }
+                    // Handle all other binary operations
+                    else {
+                        if (args.length < 4) {
+                            log.push(`ERROR: ${op} requires 4 parameters`);
+                            continue;
+                        }
+                        const [srcAddr, destAddr, srcType, destType] = args;
+                        const srcStorage = srcType === 'orig' ? state.orig : (srcType === 'sln' ? state.sln : state.scratch);
+                        const destStorage = destType === 'sln' ? state.sln : state.scratch;
+                        // Check if trying to write to read-only 'orig' storage
+                        if (destType === 'orig') {
+                            log.push(`ERROR: Cannot write to read-only 'orig' storage with ${op}`);
+                            continue;
+                        }
+                        if (srcAddr >= arraySize || destAddr >= arraySize) {
+                            log.push(`SKIPPED ${op}: address out of bounds (src=${srcAddr}, dest=${destAddr})`);
+                            continue;
+                        }
+                        if (op === 'CMP') {
+                            state.cmp = CMP(srcAddr, destAddr, srcStorage, destStorage);
+                            log.push(`CMP [${srcType}][${srcAddr}] vs [${destType}][${destAddr}]: ${srcStorage[srcAddr]} vs ${destStorage[destAddr]} → ${JSON.stringify(state.cmp)}`);
+                        }
+                        else if (op === 'MOV' || op === 'COPY') {
+                            if (destType === 'sln') {
+                                state.sln = MOV(srcAddr, destAddr, srcStorage, state.sln);
+                            } else {
+                                state.scratch = MOV(srcAddr, destAddr, srcStorage, state.scratch);
+                            }
+                            log.push(`${op} [${srcType}][${srcAddr}]->[${destType}][${destAddr}]: value=${srcStorage[srcAddr]}`);
+                        }
+                        else if (op === 'SWAP') {
+                            const valA = srcStorage[srcAddr] !== undefined ? srcStorage[srcAddr] : 0;
+                            const valB = destStorage[destAddr] !== undefined ? destStorage[destAddr] : 0;
+                            state.sln = [...state.sln];
+                            state.scratch = [...state.scratch];
+                            // Check if trying to swap with read-only 'orig' storage
+                            if (srcType === 'orig' || destType === 'orig') {
+                                log.push(`ERROR: Cannot SWAP with read-only 'orig' storage`);
+                                continue;
+                            }
+                            if (srcType === 'scratch' && destType === 'scratch') {
+                                const temp = state.scratch[srcAddr];
+                                state.scratch[srcAddr] = state.scratch[destAddr];
+                                state.scratch[destAddr] = temp;
+                            } else if (srcType === 'sln' && destType === 'sln') {
+                                const temp = state.sln[srcAddr];
+                                state.sln[srcAddr] = state.sln[destAddr];
+                                state.sln[destAddr] = temp;
+                            } else if (srcType === 'sln' && destType === 'scratch') {
+                                state.scratch[destAddr] = state.sln[srcAddr];
+                                state.sln[srcAddr] = valB;
+                            } else if (srcType === 'scratch' && destType === 'sln') {
+                                state.sln[destAddr] = state.scratch[srcAddr];
+                                state.scratch[srcAddr] = valB;
+                            }
+                            log.push(`SWAP [${srcType}][${srcAddr}] ↔ [${destType}][${destAddr}]: ${valA} ↔ ${valB}`);
+                        }
+                        // Arithmetic operations - fixed to use dest = dest OP src semantics
+                        else if (op === 'ADD') {
+                            const srcVal = srcStorage[srcAddr] !== undefined ? srcStorage[srcAddr] : 0;
+                            const destVal = destStorage[destAddr] !== undefined ? destStorage[destAddr] : 0;
+                            const result = destVal + srcVal;
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = Math.round(result);
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = Math.round(result);
+                            }
+                            log.push(`ADD [${destType}][${destAddr}] += [${srcType}][${srcAddr}]: ${destVal} + ${srcVal} = ${result}`);
+                        }
+                        else if (op === 'SUB') {
+                            const srcVal = srcStorage[srcAddr] !== undefined ? srcStorage[srcAddr] : 0;
+                            const destVal = destStorage[destAddr] !== undefined ? destStorage[destAddr] : 0;
+                            const result = destVal - srcVal;
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = Math.round(result);
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = Math.round(result);
+                            }
+                            log.push(`SUB [${destType}][${destAddr}] -= [${srcType}][${srcAddr}]: ${destVal} - ${srcVal} = ${result}`);
+                        }
+                        else if (op === 'MUL') {
+                            const srcVal = srcStorage[srcAddr] !== undefined ? srcStorage[srcAddr] : 0;
+                            const destVal = destStorage[destAddr] !== undefined ? destStorage[destAddr] : 0;
+                            const result = destVal * srcVal;
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = Math.round(result);
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = Math.round(result);
+                            }
+                            log.push(`MUL [${destType}][${destAddr}] *= [${srcType}][${srcAddr}]: ${destVal} * ${srcVal} = ${result}`);
+                        }
+                        else if (op === 'DIV') {
+                            const srcVal = srcStorage[srcAddr] !== undefined ? srcStorage[srcAddr] : 0;
+                            const destVal = destStorage[destAddr] !== undefined ? destStorage[destAddr] : 0;
+                            const result = srcVal !== 0 ? destVal / srcVal : 0;
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = Math.round(result);
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = Math.round(result);
+                            }
+                            log.push(`DIV [${destType}][${destAddr}] /= [${srcType}][${srcAddr}]: ${destVal} / ${srcVal} = ${result}`);
+                        }
+                        else if (op === 'MOD') {
+                            const srcVal = srcStorage[srcAddr] !== undefined ? srcStorage[srcAddr] : 0;
+                            const destVal = destStorage[destAddr] !== undefined ? destStorage[destAddr] : 0;
+                            const result = srcVal !== 0 ? destVal % srcVal : 0;
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = Math.round(result);
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = Math.round(result);
+                            }
+                            log.push(`MOD [${destType}][${destAddr}] %= [${srcType}][${srcAddr}]: ${destVal} % ${srcVal} = ${result}`);
+                        }
+                        else if (op === 'MAX') {
+                            const srcVal = srcStorage[srcAddr] !== undefined ? srcStorage[srcAddr] : 0;
+                            const destVal = destStorage[destAddr] !== undefined ? destStorage[destAddr] : 0;
+                            const result = Math.max(destVal, srcVal);
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = Math.round(result);
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = Math.round(result);
+                            }
+                            log.push(`MAX [${destType}][${destAddr}], [${srcType}][${srcAddr}]: max(${destVal}, ${srcVal}) = ${result}`);
+                        }
+                        else if (op === 'MIN') {
+                            const srcVal = srcStorage[srcAddr] !== undefined ? srcStorage[srcAddr] : 0;
+                            const destVal = destStorage[destAddr] !== undefined ? destStorage[destAddr] : 0;
+                            const result = Math.min(destVal, srcVal);
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = Math.round(result);
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = Math.round(result);
+                            }
+                            log.push(`MIN [${destType}][${destAddr}], [${srcType}][${srcAddr}]: min(${destVal}, ${srcVal}) = ${result}`);
+                        }
+                        // Bitwise operations - fixed to use dest = dest OP src semantics
+                        else if (op === 'AND') {
+                            const srcVal = srcStorage[srcAddr] !== undefined ? srcStorage[srcAddr] : 0;
+                            const destVal = destStorage[destAddr] !== undefined ? destStorage[destAddr] : 0;
+                            const result = Math.floor(destVal) & Math.floor(srcVal);
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = result;
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = result;
+                            }
+                            log.push(`AND [${destType}][${destAddr}] &= [${srcType}][${srcAddr}]: ${destVal} & ${srcVal} = ${result}`);
+                        }
+                        else if (op === 'OR') {
+                            const srcVal = srcStorage[srcAddr] !== undefined ? srcStorage[srcAddr] : 0;
+                            const destVal = destStorage[destAddr] !== undefined ? destStorage[destAddr] : 0;
+                            const result = Math.floor(destVal) | Math.floor(srcVal);
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = result;
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = result;
+                            }
+                            log.push(`OR [${destType}][${destAddr}] |= [${srcType}][${srcAddr}]: ${destVal} | ${srcVal} = ${result}`);
+                        }
+                        else if (op === 'XOR') {
+                            const srcVal = srcStorage[srcAddr] !== undefined ? srcStorage[srcAddr] : 0;
+                            const destVal = destStorage[destAddr] !== undefined ? destStorage[destAddr] : 0;
+                            const result = Math.floor(destVal) ^ Math.floor(srcVal);
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = result;
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = result;
+                            }
+                            log.push(`XOR [${destType}][${destAddr}] ^= [${srcType}][${srcAddr}]: ${destVal} ^ ${srcVal} = ${result}`);
+                        }
+                        else if (op === 'SHL') {
+                            const srcVal = srcStorage[srcAddr] !== undefined ? srcStorage[srcAddr] : 0;
+                            const destVal = destStorage[destAddr] !== undefined ? destStorage[destAddr] : 0;
+                            const result = Math.floor(destVal) << Math.floor(srcVal);
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = result;
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = result;
+                            }
+                            log.push(`SHL [${destType}][${destAddr}] <<= [${srcType}][${srcAddr}]: ${destVal} << ${srcVal} = ${result}`);
+                        }
+                        else if (op === 'SHR') {
+                            const srcVal = srcStorage[srcAddr] !== undefined ? srcStorage[srcAddr] : 0;
+                            const destVal = destStorage[destAddr] !== undefined ? destStorage[destAddr] : 0;
+                            const result = Math.floor(destVal) >> Math.floor(srcVal);
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = result;
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = result;
+                            }
+                            log.push(`SHR [${destType}][${destAddr}] >>= [${srcType}][${srcAddr}]: ${destVal} >> ${srcVal} = ${result}`);
+                        }
+                        else if (op === 'ROL') {
+                            const srcVal = srcStorage[srcAddr] !== undefined ? srcStorage[srcAddr] : 0;
+                            const destVal = destStorage[destAddr] !== undefined ? destStorage[destAddr] : 0;
+                            const bits = 32;
+                            const shift = Math.floor(srcVal) % bits;
+                            const result = (Math.floor(destVal) << shift) | (Math.floor(destVal) >>> (bits - shift));
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = result;
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = result;
+                            }
+                            log.push(`ROL [${destType}][${destAddr}] rol= [${srcType}][${srcAddr}]: ${destVal} rol ${srcVal} = ${result}`);
+                        }
+                        else if (op === 'ROR') {
+                            const srcVal = srcStorage[srcAddr] !== undefined ? srcStorage[srcAddr] : 0;
+                            const destVal = destStorage[destAddr] !== undefined ? destStorage[destAddr] : 0;
+                            const bits = 32;
+                            const shift = Math.floor(srcVal) % bits;
+                            const result = (Math.floor(destVal) >>> shift) | (Math.floor(destVal) << (bits - shift));
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = result;
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = result;
+                            }
+                            log.push(`ROR [${destType}][${destAddr}] ror= [${srcType}][${srcAddr}]: ${destVal} ror ${srcVal} = ${result}`);
+                        }
+                        // Data movement
+                        else if (op === 'ZERO') {
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = 0;
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = 0;
+                            }
+                            log.push(`ZERO [${destType}][${destAddr}]: set to 0`);
+                        }
+                        else if (op === 'SET1') {
+                            if (destType === 'sln') {
+                                state.sln = [...state.sln];
+                                state.sln[destAddr] = 1;
+                            } else {
+                                state.scratch = [...state.scratch];
+                                state.scratch[destAddr] = 1;
+                            }
+                            log.push(`SET1 [${destType}][${destAddr}]: set to 1`);
+                        }
+                        // Conditional moves
+                        else if (op.startsWith('CMOV')) {
+                            const cond = op.slice(4);
+                            if (state.cmp[cond]) {
+                                if (destType === 'sln') {
+                                    state.sln = MOV(srcAddr, destAddr, srcStorage, state.sln);
+                                } else {
+                                    state.scratch = MOV(srcAddr, destAddr, srcStorage, state.scratch);
+                                }
+                                log.push(`${op} [${srcType}][${srcAddr}]->[${destType}][${destAddr}]: value=${srcStorage[srcAddr]} (cond ${cond}=true)`);
+                            } else {
+                                log.push(`${op} [${srcType}][${srcAddr}]->[${destType}][${destAddr}]: skipped (cond ${cond}=false)`);
+                            }
+                        }
+                        else {
+                            log.push(`UNKNOWN OPERATION: ${op}`);
+                        }
+                    }
+                } catch (e) {
+                    log.push(`ERROR in ${op}: ${e.message}`);
+                    console.error(`Error executing ${op}:`, e);
+                }
+            }
+            log.push(`Final state: orig=${JSON.stringify(state.orig)}, sln=${JSON.stringify(state.sln)}, scratch=${JSON.stringify(state.scratch)}`);
+            return { result: state.sln, log };
+        }
+        function generateRandomProgram(maxLength) {
+            const ops = [
+                'CMP', 'MOV', 'COPY', 'SWAP', 'WRITE',
+                'CMOVL', 'CMOVLE', 'CMOVG', 'CMOVGE', 'CMOVE', 'CMOVNE',
+                'ADD', 'SUB', 'MUL', 'DIV', 'MOD', 'MAX', 'MIN',
+                'AND', 'OR', 'XOR', 'NOT', 'SHL', 'SHR', 'ROL', 'ROR',
+                'ZERO', 'SET1', 'NEG', 'ABS', 'INC', 'DEC'
+            ];
+            const storages = ['orig', 'sln', 'scratch'];  // Include 'orig' as valid source storage
+            const validDestStorages = ['sln', 'scratch']; // 'orig' is read-only, cannot be destination
+            const program = [];
+            const arraySize = parseInt(document.getElementById('array-size').value);
+            const len = Math.floor(Math.random() * maxLength) + 3;
+            for (let i = 0; i < len; i++) {
+                let instr;
+                const op = ops[Math.floor(Math.random() * ops.length)];
+                if (op === 'WRITE') {
+                    const value = Math.floor(Math.random() * 20) - 10;
+                    const address = Math.floor(Math.random() * arraySize);
+                    instr = {
+                        op: 'WRITE',
+                        args: [value, address]
+                    };
+                } else if (['INC', 'DEC', 'NEG', 'ABS', 'NOT'].includes(op)) {
+                    // Unary ops: [address, storageType] - ensure not writing to 'orig'
+                    const address = Math.floor(Math.random() * arraySize);
+                    const storageType = validDestStorages[Math.floor(Math.random() * validDestStorages.length)];
+                    instr = {
+                        op: op,
+                        args: [address, storageType]
+                    };
+                } else {
+                    // Binary ops: [srcAddr, destAddr, srcType, destType]
+                    // srcType can be 'orig', 'sln', 'scratch'
+                    // destType can only be 'sln', 'scratch' (not 'orig')
+                    instr = {
+                        op: op,
+                        args: [
+                            Math.floor(Math.random() * arraySize),
+                            Math.floor(Math.random() * arraySize),
+                            storages[Math.floor(Math.random() * storages.length)],
+                            validDestStorages[Math.floor(Math.random() * validDestStorages.length)]
+                        ]
+                    };
+                }
+                program.push(instr);
+            }
+            return program;
+        }
+        function evaluateFitness(program) {
+            if (!parseTrainingData()) {
+                return 0;
+            }
+            let totalDistance = 0;
+            let perfectMatches = 0;
+            let allPerfect = true;
+            for (const { input, output } of trainingData) {
+                try {
+                    const { result } = runProgram(program, input, output);
+                    const isPerfect = JSON.stringify(result) === JSON.stringify(output);
+                    if (isPerfect) {
+                        perfectMatches++;
+                    } else {
+                        allPerfect = false;
+                    }
+                    for (let i = 0; i < output.length; i++) {
+                        totalDistance += Math.abs((result[i] || 0) - output[i]);
+                    }
+                } catch (e) {
+                    totalDistance += 1000;
+                    allPerfect = false;
+                }
+            }
+            const perfectScore = perfectMatches / trainingData.length;
+            const distanceScore = 1 / (1 + totalDistance);
+            const accuracyScore = perfectScore * 0.8 + distanceScore * 0.2;
+            // Special case: perfect accuracy + reasonable efficiency = 100%
+            if (allPerfect) {
+                const efficiencyScore = calculateEfficiencyScore(program);
+                if (efficiencyScore >= 0.9) {
+                    return 1.0;
+                }
+            }
+            const instructionValue = calculateInstructionValue(program);
+            return accuracyScore * instructionValue;
+        }
+        function calculateEfficiencyScore(program) {
+            const arraySize = parseInt(document.getElementById('array-size').value);
+            const theoreticalMinimum = arraySize; // At least one op per element
+            const lengthEfficiency = theoreticalMinimum / Math.max(theoreticalMinimum, program.length);
+            let qualityScore = 0;
+            const highValueOps = [
+                'ADD', 'SUB', 'MUL', 'DIV', 'MAX', 'MIN', 'ABS', 'INC', 'DEC',
+                'AND', 'OR', 'XOR', 'NOT', 'SHL', 'SHR', 'ROL', 'ROR'
+            ];
+            for (const instr of program) {
+                if (highValueOps.includes(instr.op)) {
+                    qualityScore += 1.2;
+                } else if (['CMP', 'CMOVL', 'CMOVLE', 'CMOVG', 'CMOVGE', 'CMOVE', 'CMOVNE', 'WRITE', 'SWAP', 'MOD'].includes(instr.op)) {
+                    qualityScore += 0.9;
+                } else {
+                    qualityScore += 0.7;
+                }
+            }
+            const avgQuality = qualityScore / program.length;
+            const qualityBonus = Math.min(1.0, avgQuality * 0.8);
+            return (lengthEfficiency * 0.7) + (qualityBonus * 0.3);
+        }
+        function calculateInstructionValue(program) {
+            if (program.length === 0) return 0;
+            let valuableInstructionCount = 0;
+            const arraySize = parseInt(document.getElementById('array-size').value);
+            for (const instr of program) {
+                const highValueOps = [
+                    'ADD', 'SUB', 'MUL', 'DIV', 'MAX', 'MIN', 'ABS', 'INC', 'DEC',
+                    'AND', 'OR', 'XOR', 'NOT', 'SHL', 'SHR', 'ROL', 'ROR'
+                ];
+                const mediumValueOps = [
+                    'CMOVL', 'CMOVLE', 'CMOVG', 'CMOVGE', 'CMOVE', 'CMOVNE',
+                    'CMP', 'WRITE', 'SWAP', 'MOD','MOV', 'COPY'
+                ];
+                const lowValueOps = [ 'ZERO', 'SET1', 'NEG'];
+                // Skip redundant operations
+                if (isRedundantInstruction(instr)) {
+                    continue;
+                }
+                if (highValueOps.includes(instr.op)) {
+                    valuableInstructionCount += 1.0;
+                } else if (mediumValueOps.includes(instr.op)) {
+                    valuableInstructionCount += 0.7;
+                } else if (lowValueOps.includes(instr.op)) {
+                    valuableInstructionCount += 0.3;
+                } else {
+                    valuableInstructionCount += 0.5;
+                }
+            }
+            const maxPossibleValue = program.length * 1.0;
+            const normalizedValue = valuableInstructionCount / maxPossibleValue;
+            const maxLength = parseInt(document.getElementById('max-program-length').value);
+            const lengthRatio = program.length / maxLength;
+            let lengthBonus;
+            if (program.length <= 3) {
+                lengthBonus = 1.0;
+            } else if (program.length <= arraySize) {
+                lengthBonus = 0.95;
+            } else {
+                lengthBonus = Math.max(0.5, 1 - (0.1 * lengthRatio));
+            }
+            return normalizedValue * lengthBonus;
+        }
+        function isRedundantInstruction(instr) {
+            if (instr.op === 'MOV' || instr.op === 'COPY') {
+                if (instr.args[0] === instr.args[1] && instr.args[2] === instr.args[3]) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        function getMutationRates() {
+            const rate = document.getElementById('mutation-rate').value;
+            const rates = {
+                low: { remove: 0.15, add: 0.35, modify: 0.50 },
+                medium: { remove: 0.25, add: 0.40, modify: 0.35 },
+                high: { remove: 0.35, add: 0.45, modify: 0.20 }
+            };
+            return rates[rate];
+        }
+        function crossoverPrograms(parent1, parent2) {
+            if (parent1.length < 2 || parent2.length < 2) {
+                return Math.random() < 0.5 ? JSON.parse(JSON.stringify(parent1)) : JSON.parse(JSON.stringify(parent2));
+            }
+            const child = [];
+            const crossoverPoint = Math.floor(Math.random() * Math.min(parent1.length, parent2.length));
+            // Take first part from parent1, second part from parent2
+            for (let i = 0; i < crossoverPoint; i++) {
+                if (i < parent1.length) {
+                    child.push(JSON.parse(JSON.stringify(parent1[i])));
+                }
+            }
+            for (let i = crossoverPoint; i < parent2.length; i++) {
+                child.push(JSON.parse(JSON.stringify(parent2[i])));
+            }
+            // Ensure child has reasonable length
+            const maxLength = parseInt(document.getElementById('max-program-length').value);
+            if (child.length > maxLength) {
+                return child.slice(0, maxLength);
+            }
+            // Validate the child program after crossover
+            return validateProgram(child);
+        }
+        function validateProgram(program) {
+            const validDestStorages = ['sln', 'scratch'];
+            return program.map(instr => {
+                if (instr.op === 'WRITE') {
+                    return instr;
+                } else if (['INC', 'DEC', 'NEG', 'ABS', 'NOT'].includes(instr.op)) {
+                    // Ensure unary ops don't target 'orig'
+                    if (instr.args[1] === 'orig') {
+                        return {
+                            ...instr,
+                            args: [instr.args[0], validDestStorages[Math.floor(Math.random() * validDestStorages.length)]]
+                        };
+                    }
+                    return instr;
+                } else {
+                    // Ensure binary ops don't write to 'orig'
+                    if (instr.args[3] === 'orig') {
+                        return {
+                            ...instr,
+                            args: [
+                                instr.args[0],
+                                instr.args[1],
+                                instr.args[2],
+                                validDestStorages[Math.floor(Math.random() * validDestStorages.length)]
+                            ]
+                        };
+                    }
+                    return instr;
+                }
+            });
+        }
+        function mutateProgram(program, customRates = null) {
+            const newProg = JSON.parse(JSON.stringify(program));
+            const rates = customRates || getMutationRates();
+            const ops = [
+                'CMP', 'MOV', 'COPY', 'SWAP', 'WRITE',
+                'CMOVL', 'CMOVLE', 'CMOVG', 'CMOVGE', 'CMOVE', 'CMOVNE',
+                'ADD', 'SUB', 'MUL', 'DIV', 'MOD', 'MAX', 'MIN',
+                'AND', 'OR', 'XOR', 'NOT', 'SHL', 'SHR', 'ROL', 'ROR',
+                'ZERO', 'SET1', 'NEG', 'ABS', 'INC', 'DEC'
+            ];
+            const storages = ['orig', 'sln', 'scratch'];  // Include 'orig' as valid source storage
+            const validDestStorages = ['sln', 'scratch']; // 'orig' is read-only, cannot be destination
+            const arraySize = parseInt(document.getElementById('array-size').value);
+            // Multiple mutations possible but with decreasing probability
+            const numMutations = Math.floor(Math.random() * 3); // 0-2 mutations
+            for (let m = 0; m < numMutations; m++) {
+                const mutType = Math.random();
+                if (mutType < rates.remove && newProg.length > 2) {
+                    // Remove instruction
+                    const removeIdx = Math.floor(Math.random() * newProg.length);
+                    newProg.splice(removeIdx, 1);
+                } 
+                else if (mutType < rates.remove + rates.add) {
+                    // Add instruction
+                    const op = ops[Math.floor(Math.random() * ops.length)];
+                    let newInstr;
+                    if (op === 'WRITE') {
+                        const value = Math.floor(Math.random() * 20) - 10;
+                        const address = Math.floor(Math.random() * arraySize);
+                        newInstr = {
+                            op: 'WRITE',
+                            args: [value, address]
+                        };
+                    } 
+                    else if (['INC', 'DEC', 'NEG', 'ABS', 'NOT'].includes(op)) {
+                        // Unary operations - single address parameter
+                        const address = Math.floor(Math.random() * arraySize);
+                        const storageType = validDestStorages[Math.floor(Math.random() * validDestStorages.length)];
+                        newInstr = {
+                            op: op,
+                            args: [address, storageType]
+                        };
+                    } 
+                    else {
+                        // Binary operations - source and destination
+                        newInstr = {
+                            op: op,
+                            args: [
+                                Math.floor(Math.random() * arraySize),
+                                Math.floor(Math.random() * arraySize),
+                                storages[Math.floor(Math.random() * storages.length)],
+                                validDestStorages[Math.floor(Math.random() * validDestStorages.length)]
+                            ]
+                        };
+                    }
+                    const insertIdx = Math.floor(Math.random() * (newProg.length + 1));
+                    newProg.splice(insertIdx, 0, newInstr);
+                } 
+                else {
+                    // Modify instruction
+                    if (newProg.length === 0) continue;
+                    const idx = Math.floor(Math.random() * newProg.length);
+                    const op = ops[Math.floor(Math.random() * ops.length)];
+                    if (op === 'WRITE') {
+                        const value = Math.floor(Math.random() * 20) - 10;
+                        const address = Math.floor(Math.random() * arraySize);
+                        newProg[idx] = {
+                            op: 'WRITE',
+                            args: [value, address]
+                        };
+                    } 
+                    else if (['INC', 'DEC', 'NEG', 'ABS', 'NOT'].includes(op)) {
+                        const address = Math.floor(Math.random() * arraySize);
+                        const storageType = validDestStorages[Math.floor(Math.random() * validDestStorages.length)];
+                        newProg[idx] = {
+                            op: op,
+                            args: [address, storageType]
+                        };
+                    } 
+                    else {
+                        newProg[idx] = {
+                            op: op,
+                            args: [
+                                Math.floor(Math.random() * arraySize),
+                                Math.floor(Math.random() * arraySize),
+                                storages[Math.floor(Math.random() * storages.length)],
+                                validDestStorages[Math.floor(Math.random() * validDestStorages.length)]
+                            ]
+                        };
+                    }
+                }
+            }
+            // Ensure reasonable program length
+            const maxLength = parseInt(document.getElementById('max-program-length').value);
+            if (newProg.length > maxLength) {
+                return newProg.slice(0, maxLength);
+            }
+            return validateProgram(newProg);
+        }
+        function selectParent(population, fitnesses) {
+            const strategy = document.getElementById('selection-strategy').value;
+            if (strategy === 'tournament') {
+                const tournamentSize = 5;
+                let bestIdx = Math.floor(Math.random() * population.length);
+                let bestFit = fitnesses[bestIdx];
+                for (let i = 1; i < tournamentSize; i++) {
+                    const idx = Math.floor(Math.random() * population.length);
+                    if (fitnesses[idx] > bestFit) {
+                        bestIdx = idx;
+                        bestFit = fitnesses[idx];
+                    }
+                }
+                return population[bestIdx];
+            } 
+            else if (strategy === 'roulette') {
+                const totalFitness = fitnesses.reduce((a, b) => a + b, 0);
+                let random = Math.random() * totalFitness;
+                for (let i = 0; i < population.length; i++) {
+                    random -= fitnesses[i];
+                    if (random <= 0) return population[i];
+                }
+                return population[0];
+            } 
+            else { // Elite strategy - optimized version
+                // Cache elite indices per generation to avoid repeated sorting
+                if (!this.eliteCache || this.eliteCache.generation !== generationHistory.length) {
+                    const eliteCount = Math.max(1, Math.floor(population.length * 0.1));
+                    // Use partial sort - much faster than full sort
+                    const eliteIndices = [...fitnesses.keys()]
+                        .sort((a, b) => fitnesses[b] - fitnesses[a])
+                        .slice(0, eliteCount);
+                    this.eliteCache = {
+                        generation: generationHistory.length,
+                        indices: eliteIndices
+                    };
+                }
+                const eliteIndices = this.eliteCache.indices;
+                const randomIdx = eliteIndices[Math.floor(Math.random() * eliteIndices.length)];
+                return population[randomIdx];
+            }
+        }
+        async function startTraining() {
+            if (!parseTrainingData()) {
+                return;
+            }
+            if (isTraining) {
+                shouldStop = true;
+                return;
+            }
+            isTraining = true;
+            shouldStop = false;
+            solutionsFound = 0;
+            generationHistory = [];
+            const trainBtn = document.getElementById('train-btn');
+            trainBtn.classList.remove('btn-train');
+            trainBtn.classList.add('btn-reset');
+            document.getElementById('train-text').innerHTML = '<span class="spinner"></span> Training... (Click to Stop)';
+            const popSize = parseInt(document.getElementById('population-size').value);
+            const maxGen = parseInt(document.getElementById('max-generations').value);
+            const maxLength = parseInt(document.getElementById('max-program-length').value);
+            let population = Array(popSize).fill(null).map(() => generateRandomProgram(maxLength));
+            let bestProgram = population[0];
+            let bestFitness = 0;
+            let generationsWithoutImprovement = 0;
+            const stagnationThreshold = 20; // Generations before reducing mutation
+            for (let gen = 0; gen < maxGen && !shouldStop; gen++) {
+                const fitnesses = population.map(p => evaluateFitness(p));
+                const maxFit = Math.max(...fitnesses);
+                const mvsd=mvsd_1pass(fitnesses);
+                const maxIdx = fitnesses.indexOf(maxFit);
+                // Update global best if we found a better solution
+                if (maxFit > bestFitness) {
+                    bestFitness = maxFit;
+                    bestProgram = JSON.parse(JSON.stringify(population[maxIdx]));
+                    learnedProgram = bestProgram;
+                    displayProgram();
+                    if (bestFitness === 1.0) {
+                        solutionsFound++;
+                    }
+                    generationsWithoutImprovement = 0;
+                } else {
+                    generationsWithoutImprovement++;
+                }
+                generationHistory.push({
+                    gen: gen + 1,
+                    fitness: maxFit,
+                    avgFitness: mvsd[0],
+                    stdDev: mvsd[2],
+                    isBest: maxFit >= bestFitness
+                });
+                updateProgress(gen + 1, maxGen, bestFitness, mvsd[0],mvsd[2]);
+                // Early stopping if we found perfect solution and stabilized
+                if (bestFitness === 1.0 && gen > 50 && generationsWithoutImprovement > 10) {
+                    break;
+                }
+                // ELITE PRESERVATION - Always keep the global best solution
+                const elite = [];
+                // Always preserve the global best solution
+                elite.push(JSON.parse(JSON.stringify(bestProgram)));
+                // Preserve additional elites from current generation
+                const eliteCount = Math.max(1, Math.floor(popSize * 0.1)); // 10% elite + global best
+                const sortedIndices = fitnesses
+                    .map((fit, idx) => ({ fit, idx }))
+                    .sort((a, b) => b.fit - a.fit);
+                for (let i = 0; i < eliteCount && elite.length < Math.floor(popSize * 0.3); i++) {
+                    // Don't add duplicates of the global best
+                    if (JSON.stringify(population[sortedIndices[i].idx]) !== JSON.stringify(bestProgram)) {
+                        elite.push(JSON.parse(JSON.stringify(population[sortedIndices[i].idx])));
+                    }
+                }
+                // ADAPTIVE MUTATION - Reduce mutation rate when we have good solutions
+                let currentMutationRates = getMutationRates();
+                if (bestFitness > 0.9 && generationsWithoutImprovement > 5) {
+                    // Reduce mutation intensity when we have good solutions
+                    currentMutationRates = {
+                        remove: currentMutationRates.remove * 0.5,
+                        add: currentMutationRates.add * 0.5,
+                        modify: currentMutationRates.modify * 0.5
+                    };
+                }
+                // Create new population with crossover and mutation
+                const newPop = [...elite];
+                // Fill the rest of the population
+                while (newPop.length < popSize) {
+                    // Crossover: 70% chance, Mutation: 30% chance
+                    if (Math.random() < 0.7 && newPop.length >= 2) {
+                        // Crossover between two good parents
+                        const parent1 = selectParent(population, fitnesses);
+                        const parent2 = selectParent(population, fitnesses);
+                        newPop.push(crossoverPrograms(parent1, parent2));
+                    } else {
+                        // Mutation of a single parent
+                        const parent = selectParent(population, fitnesses);
+                        newPop.push(mutateProgram(parent, currentMutationRates));
+                    }
+                }
+                population = newPop;
+                if (gen % 5 === 0) {
+                    await new Promise(resolve => setTimeout(resolve, 1));
+                }
+            }
+            isTraining = false;
+            trainBtn.classList.remove('btn-reset');
+            trainBtn.classList.add('btn-train');
+            document.getElementById('train-text').textContent = 'Train Program';
+            document.getElementById('execute-btn').disabled = false;
+            if (bestFitness === 1.0) {
+                document.getElementById('best-badge').innerHTML = '<span class="best-program-badge">✓ PERFECT SOLUTION</span>';
+            }
+        }
+        function updateProgress(gen, maxGen, bestFit, avgFit,stdDev) {
+            const percent = (gen / maxGen) * 100;
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('progress-bar').textContent = Math.round(percent) + '%';
+            document.getElementById('generation').textContent = gen;
+            document.getElementById('fitness').textContent = (bestFit * 100).toFixed(1) + '%';
+            document.getElementById('avg-fitness').textContent = (avgFit * 100).toFixed(1) + '%';
+            document.getElementById('std-dev').textContent = stdDev.toFixed(4);
+            document.getElementById('solutions-found').textContent = solutionsFound;
+            const historyContainer = document.getElementById('generation-history');
+            const recentHistory = generationHistory.slice(-10).reverse();
+            historyContainer.innerHTML = recentHistory.map(h => `
+                <div class="generation-item ${h.isBest ? 'best' : ''}">
+                    <span>Gen ${h.gen}</span>
+                    <span>Best: ${(h.fitness * 100).toFixed(1)}% | Avg: ${(h.avgFitness * 100).toFixed(1)}% | Std dev: ${h.stdDev.toFixed(4)}</span>
+                </div>
+            `).join('');
+        }
+        function displayProgram() {
+            const display = document.getElementById('program-display');
+            if (learnedProgram.length === 0) {
+                display.className = 'code-display empty';
+                display.textContent = 'No program learned yet';
+                document.getElementById('program-length').textContent = '0';
+                document.getElementById('test-results').textContent = '—';
+            } else {
+                display.className = 'code-display';
+                display.innerHTML = learnedProgram.map((instr, idx) => {
+                    const lineNum = String(idx).padStart(2, '0');
+                    const unaryOps = ['INC', 'DEC', 'NEG', 'ABS', 'NOT'];
+                    const destSourceOps = [
+                        'ADD', 'SUB', 'MUL', 'DIV', 'MOD', 'MAX', 'MIN',
+                        'AND', 'OR', 'XOR', 'SHL', 'SHR', 'ROL', 'ROR',
+                        'CMOVL', 'CMOVLE', 'CMOVG', 'CMOVGE', 'CMOVE', 'CMOVNE',
+                        'MOV', 'COPY'
+                    ];
+                    if (unaryOps.includes(instr.op)) {
+                        return `<div>${lineNum}: ${instr.op.padEnd(8)} [${instr.args[1]}][${instr.args[0]}]</div>`;
+                    } else if (instr.op === 'WRITE') {
+                        return `<div>${lineNum}: ${instr.op.padEnd(8)} [scratch][${instr.args[1]}], ${instr.args[0]}</div>`;
+                    } else if (instr.op === 'CMP') {
+                        return `<div>${lineNum}: ${instr.op.padEnd(8)} [${instr.args[2]}][${instr.args[0]}], [${instr.args[3]}][${instr.args[1]}]</div>`;
+                    } else if (destSourceOps.includes(instr.op)) {
+                        // Format as: OP destination, source (corrected to match execution semantics)
+                        return `<div>${lineNum}: ${instr.op.padEnd(8)} [${instr.args[3]}][${instr.args[1]}], [${instr.args[2]}][${instr.args[0]}]</div>`;
+                    } else if (instr.op === 'SWAP') {
+                        return `<div>${lineNum}: ${instr.op.padEnd(8)} [${instr.args[2]}][${instr.args[0]}], [${instr.args[3]}][${instr.args[1]}]</div>`;
+                    } else if (instr.op === 'ZERO' || instr.op === 'SET1') {
+                        return `<div>${lineNum}: ${instr.op.padEnd(8)} [${instr.args[3]}][${instr.args[1]}]</div>`;
+                    } else {
+                        return `<div>${lineNum}: ${instr.op.padEnd(8)} ${JSON.stringify(instr.args)}</div>`;
+                    }
+                }).join('');
+                document.getElementById('program-length').textContent = learnedProgram.length;
+                parseTrainingData();
+                let passed = 0;
+                for (const { input, output } of trainingData) {
+                    const { result } = runProgram(learnedProgram, input, output);
+                    if (JSON.stringify(result) === JSON.stringify(output)) {
+                        passed++;
+                    }
+                }
+                document.getElementById('test-results').textContent = `${passed}/${trainingData.length} tests passed`;
+            }
+        }
+        function executeProgram() {
+            if (learnedProgram.length === 0) return;
+            parseTrainingData();
+            if (trainingData.length === 0) return;
+            const testInput = trainingData[0].input;
+            const { result, log } = runProgram(learnedProgram, testInput, trainingData[0].output);
+            document.getElementById('log-container').style.display = 'block';
+            document.getElementById('execution-log').innerHTML = log.map(line => 
+                `<div class="log-line">${line}</div>`
+            ).join('');
+            setTimeout(() => {
+                document.getElementById('log-container').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+        function resetAll() {
+            if (isTraining) {
+                shouldStop = true;
+            }
+            learnedProgram = [];
+            generationHistory = [];
+            solutionsFound = 0;
+            document.getElementById('generation').textContent = '0';
+            document.getElementById('fitness').textContent = '0%';
+            document.getElementById('avg-fitness').textContent = '0%';
+            document.getElementById('solutions-found').textContent = '0';
+            document.getElementById('progress-bar').style.width = '0%';
+            document.getElementById('progress-bar').textContent = '0%';
+            document.getElementById('execute-btn').disabled = true;
+            document.getElementById('log-container').style.display = 'none';
+            document.getElementById('best-badge').innerHTML = '';
+            document.getElementById('generation-history').innerHTML = '';
+            displayProgram();
+        }
+        // Initialize
+        parseTrainingData();
+        displayProgram();
+    </script>
+</body>
+</html>  
