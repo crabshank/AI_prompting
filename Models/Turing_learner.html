@@ -390,22 +390,22 @@
                 <div class="config-grid">
                     <div class="config-item">
                         <label class="config-label">Population Size</label>
-                        <input type="number" id="population-size" value="1000" min="20" max="500" step="10">
+                        <input type="number" id="population-size" value="1000" min="1" max="Number.MAX_SAFE_INTEGER" step="10">
                     </div>
                     <div class="config-item">
                         <label class="config-label">Max Generations</label>
-                        <input type="number" id="max-generations" value="1000" min="50" max="2000" step="50">
+                        <input type="number" id="max-generations" value="1000" min="1" max="Number.MAX_SAFE_INTEGER" step="50">
                     </div>
                     <div class="config-item">
                         <label class="config-label">Max Program Length</label>
-                        <input type="number" id="max-program-length" value="15" min="5" max="30" step="1">
+                        <input type="number" id="max-program-length" value="30" min="1" max="Number.MAX_SAFE_INTEGER" step="1">
                     </div>
                     <div class="config-item">
                         <label class="config-label">Mutation Rate</label>
                         <select id="mutation-rate">
                             <option value="low">Low (Conservative)</option>
-                            <option value="medium" selected>Medium (Balanced)</option>
-                            <option value="high">High (Exploratory)</option>
+                            <option value="medium">Medium (Balanced)</option>
+                            <option value="high" selected>High (Exploratory)</option>
                         </select>
                     </div>
                     <div class="config-item">
@@ -415,10 +415,6 @@
                             <option value="roulette">Roulette Wheel</option>
                             <option value="elite">Elite Only</option>
                         </select>
-                    </div>
-                    <div class="config-item">
-                        <label class="config-label">Array Size</label>
-                        <input type="number" id="array-size" value="5" min="3" max="10" step="1">
                     </div>
                 </div>
             </div>
@@ -636,6 +632,7 @@
         let shouldStop = false;
         let generationHistory = [];
         let solutionsFound = 0;
+        let arraySize=0;
         
 
 function lerp(a, b, t){
@@ -696,6 +693,11 @@ function mvsd_1pass(data){
                 input: input,
                 output: outputs[i]
             }));
+            
+            for (let k=0; k<outputs.length; k++){
+                let l=outputs[k].length;
+                arraySize=l>arraySize ? l : arraySize;
+            }
             return true;
         }
         function CMP(a, b, srcA, srcB) {
@@ -760,15 +762,15 @@ function mvsd_1pass(data){
             return newDest;
         }
         function runProgram(program, input, output) {
-            const arraySize = input.length;
+            const arraySize2 = input.length;
             const outSize=output.length;
             let state = {
                 orig: [...input],        // New read-only storage
                 sln: Array(outSize).fill(0),         // Existing output storage  
-                scratch: Array(Math.max(arraySize,outSize)).fill(0),
+                scratch: Array(Math.max(arraySize2,outSize)).fill(0),
                 cmp: {E:false,NE:false,L:false,NL:false,LE:false,NLE:false,G:false,NG:false,GE:false,NGE:false}
             };
-            for (let i=0; i<Math.min(arraySize,outSize); i++){
+            for (let i=0; i<Math.min(arraySize2,outSize); i++){
                     state.sln[i]=state.orig[i];
                }
             const log = [`Initial state: orig=${JSON.stringify(state.orig)}, sln=${JSON.stringify(state.sln)}, scratch=${JSON.stringify(state.scratch)}`];
@@ -785,7 +787,7 @@ function mvsd_1pass(data){
                         }
                         const address = args[0];
                         const storageType = args[1];
-                        if (address >= arraySize) {
+                        if (address >= arraySize2) {
                             log.push(`${op} failed: address ${address} out of bounds`);
                             continue;
                         }
@@ -839,7 +841,7 @@ function mvsd_1pass(data){
                             log.push(`ERROR: Cannot write to read-only 'orig' storage with ${op}`);
                             continue;
                         }
-                        if (srcAddr >= arraySize || destAddr >= arraySize) {
+                        if (srcAddr >= arraySize2 || destAddr >= arraySize2) {
                             log.push(`SKIPPED ${op}: address out of bounds (src=${srcAddr}, dest=${destAddr})`);
                             continue;
                         }
@@ -1128,7 +1130,7 @@ function mvsd_1pass(data){
             const storages = ['orig', 'sln', 'scratch'];  // Include 'orig' as valid source storage
             const validDestStorages = ['sln', 'scratch']; // 'orig' is read-only, cannot be destination
             const program = [];
-            const arraySize = parseInt(document.getElementById('array-size').value);
+            
             const len = Math.floor(Math.random() * maxLength) + 3;
             for (let i = 0; i < len; i++) {
                 let instr;
@@ -1204,7 +1206,7 @@ function mvsd_1pass(data){
             return accuracyScore * instructionValue;
         }
         function calculateEfficiencyScore(program) {
-            const arraySize = parseInt(document.getElementById('array-size').value);
+            
             const theoreticalMinimum = arraySize; // At least one op per element
             const lengthEfficiency = theoreticalMinimum / Math.max(theoreticalMinimum, program.length);
             let qualityScore = 0;
@@ -1228,7 +1230,7 @@ function mvsd_1pass(data){
         function calculateInstructionValue(program) {
             if (program.length === 0) return 0;
             let valuableInstructionCount = 0;
-            const arraySize = parseInt(document.getElementById('array-size').value);
+            
             for (const instr of program) {
                 const highValueOps = [
                     'ADD', 'SUB', 'MUL', 'DIV', 'MAX', 'MIN', 'ABS', 'INC', 'DEC',
@@ -1350,7 +1352,7 @@ function mvsd_1pass(data){
             ];
             const storages = ['orig', 'sln', 'scratch'];  // Include 'orig' as valid source storage
             const validDestStorages = ['sln', 'scratch']; // 'orig' is read-only, cannot be destination
-            const arraySize = parseInt(document.getElementById('array-size').value);
+            
             // Multiple mutations possible but with decreasing probability
             const numMutations = Math.floor(Math.random() * 3); // 0-2 mutations
             for (let m = 0; m < numMutations; m++) {
@@ -1691,4 +1693,4 @@ function mvsd_1pass(data){
         displayProgram();
     </script>
 </body>
-</html>  
+</html>
