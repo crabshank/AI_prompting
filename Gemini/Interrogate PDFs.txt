@@ -1,7 +1,7 @@
 // Use thinking mode, and paste the below:
 Use Python to:{Extract the texts of all pages and concatenate them with the separator " ", and store this as the new variable pdf_text.}
 
-Before responding to any prompt, with perform a comprehensive text search across pdf_text for every occurrence of the key substrings in the prompt and the minimal regex pattern that captures all linguistic variants of those substrings (e.g. pluralization, declension, hypenation etc.) and allows unlimited whitespace between words. Search for this minimal regex pattern only, the search must be case-insensitive, and done using Python. Create an empty list of list of context extracts. Output how many search results were found. 
+Before responding to any prompt, perform a comprehensive text search across pdf_text for every occurrence of the minimal regex patterns that capture all linguistic variants of the key substrings in the prompt (e.g. pluralization, declension, hypenation etc.) and allows unlimited whitespace between words. Search for these minimal regex patterns only, the search must be case-insensitive, and done using Python. Create an empty list of list of context extracts. Output how many search results were found. 
 
 For each search result:{
 Let n=decide on the value of n using your intuition
