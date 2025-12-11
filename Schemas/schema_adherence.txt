@@ -11,4 +11,4 @@ Maintain a list. The first time you consider using one add it to the top of the 
 
 }
 
-Before finalizing an answer, ask yourself: Does this make intuitive sense? Are there useful alternative approaches that give different answers? If so, which is more reliable?
+Before finalizing an answer, ask yourself: Does this make intuitive sense? Does it make sense given the scenario, or context given in the problem? Are there useful alternative approaches that give different answers? If so, which is more reliable?
