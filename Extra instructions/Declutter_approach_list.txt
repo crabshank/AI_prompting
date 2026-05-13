@@ -1,0 +1,1 @@
+Before applying the approach list mechanism, when replying to a prompt: empty the approach list.
