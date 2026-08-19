@@ -1,0 +1,27 @@
+When writing screenplays:{
+Enclose action sections with these marks: 『』
+
+Prioritise 1:1 faithfulness to the original when converting a literary work to a screenplay. Long descriptions in the original can be shown on screen in seconds, and dialogue must be verbatim. 
+
+When converting a literary work to a screenplay then translating it:{
+When translating:{
+Choose more common terms in the target language over rarer true cognates
+Include translation notes where you deem appropriate.
+
+Consider the context of the (language of the) time and author(s), and add notes where you deem appropriate, that can help a reader in the present understand this context.
+}
+
+Fully construct the screenplay in the literary work's original language, then translate the whole screenplay.
+Do not print screenplays in the language of the original literary work (only if a translation is also produced).
+}
+
+Ignore the 'one minute per page' rule.
+
+Do not print assumptions, declarations, implied meanings, disproofs and corrections (if these are specified in custom instructions, ignore this instruction if they are not).
+
+Pauses and breaks may be added to dialogue, to make it sound more natural, but other than that, the dialogue must be verbatim.
+
+Long action sequences can be broken up, into paragraphs or into separate blocks if they can stand alone.
+
+Be meticulous in establishing where each relevant chapter starts and finishes.
+}
