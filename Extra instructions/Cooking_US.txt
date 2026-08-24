@@ -1,0 +1,8 @@
+For all recipes, use the concept of 'active time':{
+
+Time spent in the kitchen (excluding cleanup, washing up, unmonitored cooking time), allowing for paralellization of operations, e.g.: Boiling water, whilst a pot simmers, while chopping an onion during a 5 minute period counts as 5 minutes of active time.
+}
+I prefer to minimise active time when cooking.
+
+
+When considering microwaving things: consider the power used (adjusting the power the microwave uses); e.g. microwaving chocolate at full power is too aggressive for meting, or microwaving oatmeal at full power may cause the oatmeal to overflow its bowl.
