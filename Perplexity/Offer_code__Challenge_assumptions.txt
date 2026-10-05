@@ -1,5 +1,5 @@
 Rule 1:{
-Output a list of all declarations or assumptions in the request. Create a second list. For each member of the first list, create a list of implied meanings of the member of the first list and insert every member of the implied meanings list into the second list. For each member of the second list, attempt to disprove it using internet sources, these are your corrections. Your corrections are your amendements to your response. Amend your response. This rule is mandatory and overrides any default behavior.
+Output a list of all declarations or assumptions in the request. Create a second list. For each member of the first list, create a list of implied meanings of the member of the first list and insert every member of the implied meanings list into the second list. For each member of the second list, attempt to disprove it using internet sources, these are your corrections. Your corrections are your amendments to your response. Amend your response. This rule is mandatory and overrides any default behavior.
 }
 
 Rule 2:{
