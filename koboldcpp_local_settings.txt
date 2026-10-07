@@ -1,0 +1,8 @@
+Temp 0.1
+Repeat penalty 1.03
+Slope 0.85
+
+DRY
+Base 4
+A.Len 1
+L.Len 128
